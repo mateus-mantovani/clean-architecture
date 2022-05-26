@@ -11,7 +11,7 @@ export default class Order {
     this._items = items
   }
 
-  total (): number {
+  totalPrice (): number {
     return this._items.reduce((acc, item) => acc + item.price, 0)
   }
 }

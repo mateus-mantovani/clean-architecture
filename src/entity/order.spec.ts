@@ -6,21 +6,21 @@ describe('Order unit test', () => {
     const item1 = new OrderItem(1, 'Item 1', 10, 'p1', 2)
     const item2 = new OrderItem(2, 'Item 2', 20, 'p2', 3)
 
-    const order = new Order(1, '123', [item1, item2])
+    const order = new Order('1', '123', [item1, item2])
     expect(order.total).toBe(80)
   })
 
   it('should throw an error if the customer id is invalid', () => {
     expect(() => {
       // eslint-disable-next-line no-unused-vars
-      const order = new Order(1, '', [])
+      const order = new Order('1', '', [])
     }).toThrowError('Customer id is invalid')
   })
 
   it('should throw an error if the order has no items', () => {
     expect(() => {
       // eslint-disable-next-line no-unused-vars
-      const order = new Order(1, '123', [])
+      const order = new Order('1', '123', [])
     }).toThrowError('Order must have at least one item')
   })
 

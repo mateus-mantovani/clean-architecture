@@ -28,6 +28,11 @@ export default class Customer {
     this.validate()
   }
 
+  changeAddress (address: Address): void {
+    this._address = address
+    this.validate()
+  }
+
   activate (): void {
     if (this._address === undefined || this._address === null) {
       throw new Error('Address is required')
@@ -45,11 +50,6 @@ export default class Customer {
 
   addRewardPoints (points: number): void {
     this._rewardPoints += points
-  }
-
-  set address (address: Address) {
-    this._address = address
-    this.validate()
   }
 
   get id (): string {

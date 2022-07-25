@@ -161,4 +161,83 @@ describe('Order repository test', () => {
       ]
     })
   })
+
+  it('should rollback on update an order when product 2 does not exist', async () => {
+    const customerRepository = new CustomerRepository()
+    const customer = new Customer('1', 'John Doe')
+    const address = new Address('street 1', 1, 'zipcode 1', 'city 1')
+    customer.changeAddress(address)
+
+    await customerRepository.create(customer)
+
+    const productRepository = new ProductRepository()
+    const product = new Product('1', 'product 1', 10)
+    // const product2 = new Product('2', 'product 2', 10) // will fail, because product 2 does not exist
+
+    await productRepository.create(product)
+    // await productRepository.create(product2)
+
+    const orderItem = new OrderItem('1', 'Product name 1', 100, '1', 2)
+    const order = new Order('1', customer.id, [orderItem])
+    const orderRepository = new OrderRepository()
+
+    await orderRepository.create(order)
+
+    const orderModel = await OrderModel.findOne(
+      {
+        where: {
+          id: order.id
+        },
+        include: ['items']
+      }
+    )
+
+    expect(orderModel).toBeDefined()
+    expect(orderModel.toJSON()).toStrictEqual({
+      id: order.id,
+      customer_id: customer.id,
+      total: order.total,
+      items: [
+        {
+          id: orderItem.id,
+          order_id: order.id,
+          product_id: orderItem.productId,
+          quantity: orderItem.quantity,
+          name: orderItem.name,
+          price: orderItem.price
+        }
+      ]
+    })
+
+    const newOrderItem = new OrderItem('2', 'Product name 2', 200, '2', 2)
+    const order1WithNewItem = new Order('1', customer.id, [orderItem, newOrderItem])
+
+    expect(orderRepository.update(order1WithNewItem)).rejects.toThrowError()
+
+    const order1Model = await OrderModel.findOne(
+      {
+        where: {
+          id: 1
+        },
+        include: ['items']
+      }
+    )
+
+    expect(order1Model).toBeDefined()
+    expect(order1Model.toJSON()).toStrictEqual({
+      id: order.id,
+      customer_id: customer.id,
+      total: order.total,
+      items: [
+        {
+          id: orderItem.id,
+          order_id: order.id,
+          product_id: orderItem.productId,
+          quantity: orderItem.quantity,
+          name: orderItem.name,
+          price: orderItem.price
+        }
+      ]
+    })
+  })
 })

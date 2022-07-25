@@ -22,14 +22,12 @@ export default class OrderRepository implements OrderRepositoryInterface {
   }
 
   async update (entity: Order): Promise<void> {
-    const transaction = await OrderModel.sequelize.transaction()
-    const order = await OrderModel.findOne({ where: { id: entity.id }, transaction })
+    const order = await OrderModel.findOne({ where: { id: entity.id } })
     if (!order) {
-      transaction.rollback()
       throw new Error('Order not found')
     }
 
-    try {
+    await OrderModel.sequelize.transaction(async (transaction) => {
       await OrderItemModel.destroy({ where: { order_id: entity.id }, transaction })
       await OrderItemModel.bulkCreate(entity.items.map(item => ({
         id: item.id,
@@ -43,12 +41,7 @@ export default class OrderRepository implements OrderRepositoryInterface {
         customer_id: entity.customerId,
         total: entity.totalPrice()
       }, { where: { id: entity.id }, transaction })
-
-      await transaction.commit()
-    } catch (error) {
-      await transaction.rollback()
-      throw error
-    }
+    })
   }
 
   async find (id: string): Promise<Order> {

@@ -30,6 +30,11 @@ export default class Order {
     return this._items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
   }
 
+  changeItems (items: Array<OrderItem>) {
+    this._items = items
+    this._total = this.totalPrice()
+  }
+
   get id () {
     return this._id
   }

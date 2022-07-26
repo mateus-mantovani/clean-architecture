@@ -124,13 +124,13 @@ describe('Order repository test', () => {
     })
 
     const newOrderItem = new OrderItem('2', 'Product name 2', 200, '2', 2)
-    const order1WithNewItem = new Order('1', customer.id, [orderItem, newOrderItem])
-    await orderRepository.update(order1WithNewItem)
+    order.changeItems([orderItem, newOrderItem])
+    await orderRepository.update(order)
 
     const order1Model = await OrderModel.findOne(
       {
         where: {
-          id: order1WithNewItem.id
+          id: order.id
         },
         include: ['items']
       }
@@ -138,9 +138,9 @@ describe('Order repository test', () => {
 
     expect(order1Model).toBeDefined()
     expect(order1Model.toJSON()).toStrictEqual({
-      id: order1WithNewItem.id,
+      id: order.id,
       customer_id: customer.id,
-      total: order1WithNewItem.total,
+      total: order.total,
       items: [
         {
           id: orderItem.id,
@@ -160,6 +160,13 @@ describe('Order repository test', () => {
         }
       ]
     })
+  })
+
+  it('should throw error when trying to update an order that does not exist', async () => {
+    const orderRepository = new OrderRepository()
+    const newOrderItem = new OrderItem('2', 'Product name 2', 200, '2', 2)
+    const order1WithNewItem = new Order('1', 'customerid', [newOrderItem])
+    await expect(orderRepository.update(order1WithNewItem)).rejects.toThrowError()
   })
 
   it('should rollback on update an order when product 2 does not exist', async () => {
@@ -263,5 +270,38 @@ describe('Order repository test', () => {
 
     expect(orderEntityFromDatabase).toBeDefined()
     expect(orderEntityFromDatabase).toEqual(order)
+  })
+
+  it('should throw error when order does not exist', async () => {
+    const orderRepository = new OrderRepository()
+    await expect(orderRepository.find('1')).rejects.toThrowError('Order not found')
+  })
+
+  it('should find all orders', async () => {
+    const customerRepository = new CustomerRepository()
+    const customer = new Customer('1', 'John Doe')
+    const address = new Address('street 1', 1, 'zipcode 1', 'city 1')
+    customer.changeAddress(address)
+
+    await customerRepository.create(customer)
+
+    const productRepository = new ProductRepository()
+    const product = new Product('1', 'product 1', 10)
+    await productRepository.create(product)
+
+    const orderItem = new OrderItem('1', 'Product name 1', 100, '1', 10)
+    const orderItem2 = new OrderItem('2', 'Product name 1', 100, '1', 10)
+
+    const order = new Order('1', customer.id, [orderItem])
+    const order2 = new Order('2', customer.id, [orderItem2])
+    const orderRepository = new OrderRepository()
+
+    await orderRepository.create(order)
+    await orderRepository.create(order2)
+
+    const orderEntityFromDatabase = await orderRepository.findAll()
+
+    expect(orderEntityFromDatabase).toBeDefined()
+    expect(orderEntityFromDatabase).toEqual([order, order2])
   })
 })

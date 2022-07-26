@@ -1,4 +1,5 @@
 import Order from '../../domain/entity/order'
+import OrderItem from '../../domain/entity/order_item'
 import OrderRepositoryInterface from '../../domain/repository/order-repository.interface'
 import OrderItemModel from '../db/sequelize/model/order-item.model '
 import OrderModel from '../db/sequelize/model/order.model'
@@ -22,12 +23,11 @@ export default class OrderRepository implements OrderRepositoryInterface {
   }
 
   async update (entity: Order): Promise<void> {
-    const order = await OrderModel.findOne({ where: { id: entity.id } })
-    if (!order) {
-      throw new Error('Order not found')
-    }
-
     await OrderModel.sequelize.transaction(async (transaction) => {
+      const order = await OrderModel.findOne({ where: { id: entity.id } })
+      if (!order) {
+        throw new Error('Order not found')
+      }
       await OrderItemModel.destroy({ where: { order_id: entity.id }, transaction })
       await OrderItemModel.bulkCreate(entity.items.map(item => ({
         id: item.id,
@@ -38,14 +38,20 @@ export default class OrderRepository implements OrderRepositoryInterface {
         order_id: entity.id
       })), { transaction })
       await OrderModel.update({
-        customer_id: entity.customerId,
         total: entity.totalPrice()
       }, { where: { id: entity.id }, transaction })
     })
   }
 
   async find (id: string): Promise<Order> {
-    return Promise.resolve(null)
+    let order
+    try {
+      order = await OrderModel.findOne({ where: { id }, rejectOnEmpty: true, include: ['items'] })
+    } catch (error) {
+      throw new Error('Order not found')
+    }
+
+    return new Order(order.id, order.customer_id, order.items.map(item => new OrderItem(item.id, item.name, item.price, item.product_id, item.quantity)))
   }
 
   async findAll (): Promise<Order[]> {

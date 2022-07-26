@@ -212,7 +212,7 @@ describe('Order repository test', () => {
     const newOrderItem = new OrderItem('2', 'Product name 2', 200, '2', 2)
     const order1WithNewItem = new Order('1', customer.id, [orderItem, newOrderItem])
 
-    expect(orderRepository.update(order1WithNewItem)).rejects.toThrowError()
+    await expect(orderRepository.update(order1WithNewItem)).rejects.toThrowError('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed')
 
     const order1Model = await OrderModel.findOne(
       {
@@ -239,5 +239,29 @@ describe('Order repository test', () => {
         }
       ]
     })
+  })
+
+  it('should find an order', async () => {
+    const customerRepository = new CustomerRepository()
+    const customer = new Customer('1', 'John Doe')
+    const address = new Address('street 1', 1, 'zipcode 1', 'city 1')
+    customer.changeAddress(address)
+
+    await customerRepository.create(customer)
+
+    const productRepository = new ProductRepository()
+    const product = new Product('1', 'product 1', 10)
+    await productRepository.create(product)
+
+    const orderItem = new OrderItem('1', 'Product name 1', 100, '1', 2)
+    const order = new Order('1', customer.id, [orderItem])
+    const orderRepository = new OrderRepository()
+
+    await orderRepository.create(order)
+
+    const orderEntityFromDatabase = await orderRepository.find('1')
+
+    expect(orderEntityFromDatabase).toBeDefined()
+    expect(orderEntityFromDatabase).toEqual(order)
   })
 })

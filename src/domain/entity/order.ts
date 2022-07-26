@@ -27,7 +27,7 @@ export default class Order {
   }
 
   totalPrice (): number {
-    return this._items.reduce((acc, item) => acc + item.price, 0)
+    return this._items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
   }
 
   get id () {

@@ -1,4 +1,4 @@
-import EventDispatcher from '../@shared/event-dispatcher'
+import EventDispatcher from '../../@shared/event/event-dispatcher'
 import CustomerCreatedEvent from './customer-created.event'
 import Action1WhenCustomerIsCreatedEventHandler from './handler/action1-when-customer-is-created.handler'
 import Action2WhenCustomerIsCreatedEventHandler from './handler/action2-when-customer-is-created.handler'

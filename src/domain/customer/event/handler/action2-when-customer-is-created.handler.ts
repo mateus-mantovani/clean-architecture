@@ -1,7 +1,7 @@
-import EventHandlerInterface from '../../@shared/event-handler.interface'
+import EventHandlerInterface from '../../../@shared/event/event-handler.interface'
 import CustomerCreatedEvent from '../customer-created.event'
 
-export default class Action1WhenCustomerIsCreatedEventHandler
+export default class Action2WhenCustomerIsCreatedEventHandler
 implements EventHandlerInterface<CustomerCreatedEvent> {
   handle (event: CustomerCreatedEvent): void {
     console.log('Esse é o primeiro console.log do evento: CustomerCreated')

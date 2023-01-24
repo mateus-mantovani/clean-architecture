@@ -13,7 +13,7 @@ class Address {
   }
 
   validate (): void {
-    if (this._street === undefined || this._street === null) {
+    if (this._street === undefined || this._street === null || this._street === '') {
       throw new Error('Street is required')
     }
 

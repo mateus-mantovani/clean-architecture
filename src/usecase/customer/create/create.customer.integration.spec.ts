@@ -52,4 +52,21 @@ describe('Integration test create customer use case', () => {
 
     expect(result).toEqual(output)
   })
+
+  it('should throw error trying to create a customer', async () => {
+    const customerRepository = new CustomerRepository()
+    const createCustomerUseCase = new CreateCustomerUseCase(customerRepository)
+
+    const input: InputCreateCustomerDto = {
+      name: '',
+      address: {
+        street: 'string',
+        number: 123,
+        zip: 'zip',
+        city: 'city'
+      }
+    }
+
+    await expect(createCustomerUseCase.execute(input)).rejects.toThrowError('Name is required')
+  })
 })

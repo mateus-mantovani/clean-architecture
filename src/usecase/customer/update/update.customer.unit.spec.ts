@@ -34,6 +34,15 @@ describe('Unit test for customer update use case', () => {
 
     const output = await customerUpdateUseCase.execute(input)
 
-    expect(output)
+    expect(output).toEqual({
+      id: customer.id,
+      name: 'John Updated',
+      address: {
+        street: 'Street Updated',
+        number: 3994,
+        zip: 'Zip updated',
+        city: 'City updated'
+      }
+    })
   })
 })

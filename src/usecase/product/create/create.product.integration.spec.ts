@@ -52,6 +52,6 @@ describe('Integration test create product use case', () => {
       price: 100
     }
 
-    await expect(createProductUseCase.execute(input)).rejects.toThrowError('Product name is invalid')
+    await expect(createProductUseCase.execute(input)).rejects.toThrowError('product: Name is required')
   })
 })

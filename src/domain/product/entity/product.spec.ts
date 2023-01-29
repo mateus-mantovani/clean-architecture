@@ -3,22 +3,29 @@ describe('Product unit test', () => {
   it('should throw an error if the product id is invalid', () => {
     expect(() => {
       // eslint-disable-next-line no-unused-vars
-      const product = new Product('', '', 10)
-    }).toThrowError('Product id is invalid')
+      const product = new Product('', 'product name', 10)
+    }).toThrowError('product: Product id is invalid')
   })
 
   it('should throw an error if the product name is invalid', () => {
     expect(() => {
       // eslint-disable-next-line no-unused-vars
       const product = new Product('123', '', 10)
-    }).toThrowError('Product name is invalid')
+    }).toThrowError('product: Product name is invalid')
   })
 
   it('should throw an error if the product price is invalid', () => {
     expect(() => {
       // eslint-disable-next-line no-unused-vars
       const product = new Product('123', 'Product', -10)
-    }).toThrowError('Product price is invalid')
+    }).toThrowError('product: Product price is invalid')
+  })
+
+  it('should throw an error if the product id, name and price are invalid', () => {
+    expect(() => {
+      // eslint-disable-next-line no-unused-vars
+      const product = new Product('', '', -10)
+    }).toThrowError('product: Product id is invalid,product: Product name is invalid,product: Product price is invalid')
   })
 
   it('should change name', () => {
@@ -32,7 +39,7 @@ describe('Product unit test', () => {
     const product = new Product('123', 'Product', 10)
     expect(() => {
       product.changeName('')
-    }).toThrowError('Product name is invalid')
+    }).toThrowError('product: Product name is invalid')
   })
 
   it('should change price', () => {
@@ -46,6 +53,6 @@ describe('Product unit test', () => {
     const product = new Product('123', 'Product', 10)
     expect(() => {
       product.changePrice(-10)
-    }).toThrowError('Product price is invalid')
+    }).toThrowError('product: Product price is invalid')
   })
 })

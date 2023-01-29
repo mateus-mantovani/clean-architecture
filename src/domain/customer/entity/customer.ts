@@ -1,26 +1,38 @@
+import Entity from '../../@shared/entity/entity.abstract'
+import NotificationError from '../../@shared/notification/notification.error'
 import Address from './address'
 import CustomerInterface from './customer.interface'
 
-export default class Customer implements CustomerInterface {
-  private _id: string
+export default class Customer extends Entity implements CustomerInterface {
   private _name: string
   private _address!: Address
   private _active: boolean = true
   private _rewardPoints: number = 0
 
   constructor (id: string, name: string) {
+    super()
     this._id = id
     this._name = name
     this.validate()
+
+    if (this.notification.hasErrors()) {
+      throw new NotificationError(this.notification.getErrors())
+    }
   }
 
   validate (): void {
-    if (this._id === undefined || this._id === null || this._id === '') {
-      throw new Error('Id is required')
+    if (this.id === undefined || this.id === null || this.id === '') {
+      this.notification.addError({
+        context: 'customer',
+        message: 'Id is required'
+      })
     }
 
     if (this._name === undefined || this._name === null || this._name === '') {
-      throw new Error('Name is required')
+      this.notification.addError({
+        context: 'customer',
+        message: 'Name is required'
+      })
     }
   }
 
@@ -51,10 +63,6 @@ export default class Customer implements CustomerInterface {
 
   addRewardPoints (points: number): void {
     this._rewardPoints += points
-  }
-
-  get id (): string {
-    return this._id
   }
 
   get address (): Address {
